@@ -3654,6 +3654,10 @@ void FunctionStackPoisoner::processStaticAllocas() {
       IntptrPtrTy);
   IRB.CreateStore(IRB.CreatePointerCast(&F, IntptrTy), BasePlus2);
 
+  // Do not leave redzone[3] uninitialized.
+  Value *BasePlus3 = IRB.CreateIntToPtr(LocalStackBase,IntptrPtrTy);
+  IRB.CreateStore(ConstantInt::get(IntptrTy, 0), BasePlus3);
+
   const auto &ShadowAfterScope = GetShadowBytesAfterScope(SVD, L);
 
   // Poison the stack red zones at the entry.
